@@ -4,6 +4,9 @@ namespace Models
 {
     public class Filme
     {
+        // Campo sequência para cada execução da API.
+        public int Id { get; set; }
+
         // Definindo o Título como campo obrigatório no body
         [Required(ErrorMessage ="A requisição deve conter o campo Título!")]
         public string Titulo { get; set; }
