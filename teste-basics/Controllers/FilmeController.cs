@@ -25,5 +25,12 @@ namespace Controllers
         {
             return filmes;
         }
+
+        [HttpGet("{id}")] // HttpGet com um parâmetro de ID que deve ser passado na URL.
+        /*public List<Filme> ListarFilme()*/
+        public Filme RecuperaFilmesPorId(int id)
+        {
+            return filmes.FirstOrDefault(filme => filme.Id == id);
+        }
     }
 }
