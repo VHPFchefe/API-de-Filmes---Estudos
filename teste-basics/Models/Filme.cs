@@ -4,6 +4,8 @@ namespace Models
 {
     public class Filme
     {
+        [Key] // Define como chave para identificação
+        [Required]
         // Campo sequência para cada execução da API.
         public int Id { get; set; }
 
