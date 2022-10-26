@@ -20,7 +20,7 @@ namespace Controllers
         public IActionResult AdicionarFilme([FromBody] Filme filme) // FromBody indica que o parâmetro será passado no body da requisição.
         {
             _context.Filmes.Add(filme);
-            _context.SaveChanges();
+            _context.SaveChanges(); // Consolida no banco de dados as alterações
             return CreatedAtAction(nameof(ListarFilmePorId), new {ID = filme.Id} ,filme); // gera código 201 Created exibindo no HEADER Location qual rota utilizar para consumir a informação criada.
         }
 
@@ -42,6 +42,32 @@ namespace Controllers
                 return Ok(filme); // retorna o filme e gera status 200 ok.
             }
             return NotFound(); // retorna null e gera status 404 NotFound.
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult AtualizarFilme(int id, [FromBody] Filme filmenovo)
+        {
+            Filme filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
+            if(filme == null)
+            {
+                return NotFound();
+            }
+            filme = filmenovo;
+            _context.SaveChanges(); // Consolida no banco de dados as alterações
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult RemoverFilme(int id)
+        {
+            Filme filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
+            if(filme == null)
+            {
+                return NotFound();
+            }
+            _context.Remove(filme);
+            _context.SaveChanges();
+            return NoContent(); // #duvida no caso da api rest usar o delete como padrão, como ficaria a questão do Hard delete e Soft delete ?
         }
     }
 }
