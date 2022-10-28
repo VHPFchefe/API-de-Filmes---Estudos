@@ -4,6 +4,7 @@ using Data;
 using Data.Dtos;
 using Models;
 using System.IO;
+using AutoMapper;
 
 namespace Controllers
 {
@@ -12,22 +13,18 @@ namespace Controllers
     public class FilmeController : ControllerBase
     {
         private FilmeContext _context;
+        private IMapper _mapper;
 
-        public FilmeController(FilmeContext context)
+        public FilmeController(FilmeContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpPost] // HttpPost indica que é um método Post de acordo com o padrão REST.
         public IActionResult AdicionarFilme([FromBody] CreateFilmeDto filmeDto) // FromBody indica que o parâmetro será passado no body da requisição.
         {
-            Filme filme = new Filme
-            {
-                Titulo = filmeDto.Titulo,
-                Genero = filmeDto.Genero,
-                Duracao = filmeDto.Duracao,
-                Diretor = filmeDto.Diretor
-            };
+            Filme filme = _mapper.Map<Filme>(filmeDto);
             _context.Filmes.Add(filme);
             _context.SaveChanges(); // Consolida no banco de dados as alterações
             return CreatedAtAction(nameof(ListarFilmePorId), new {ID = filme.Id} ,filme); // gera código 201 Created exibindo no HEADER Location qual rota utilizar para consumir a informação criada.
@@ -48,15 +45,7 @@ namespace Controllers
             Filme filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id); // Retorna o ID procurado ou nulo como retorno padrão.
             if(filme != null) // Trata os retornos nulos.
             {
-                ReadFilmeDto readFilmeDto = new ReadFilmeDto
-                {
-                    Id = filme.Id,
-                    Titulo = filme.Titulo,
-                    Genero = filme.Genero,
-                    Diretor = filme.Diretor,
-                    Duracao = filme.Duracao,
-                    HoraDaConsulta = DateTime.Now
-                };
+                ReadFilmeDto readFilmeDto = _mapper.Map<ReadFilmeDto>(filme);
                 return Ok(readFilmeDto); // retorna o filme e gera status 200 ok.
             }
             return NotFound(); // retorna null e gera status 404 NotFound.
@@ -70,10 +59,7 @@ namespace Controllers
             {
                 return NotFound();
             }
-            filme.Titulo = filmeDto.Titulo;
-            filme.Genero = filmeDto.Genero;
-            filme.Duracao = filmeDto.Duracao;
-            filme.Diretor = filmeDto.Diretor;
+            _mapper.Map(filmeDto, filme);
             _context.SaveChanges(); // Consolida no banco de dados as alterações
             return NoContent();
         }
